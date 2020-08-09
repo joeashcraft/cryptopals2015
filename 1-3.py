@@ -7,17 +7,33 @@
 #
 # You can do this by hand. But don't: write code to do it for you.
 #
-# How? Devise some method for "scoring" a piece of English plaintext. 
-# Character frequency is a good metric. Evaluate each output and 
+# How? Devise some method for "scoring" a piece of English plaintext.
+# Character frequency is a good metric. Evaluate each output and
 # choose the one with the best score.
 
 
 import sys
+from string import ascii_letters
+from s1_c2 import c2 as hex_xor
 
-input = sys.argv[1].decode('hex')
+def c3(input:str, key:str):
+    # assert len(input) == len(key)
+    _input=bytes.fromhex(input)
+    ret=''
+    for c in _input:
+         ret+=hex(c^ord(key))[2:]
+    return ret
 
-def xorstr(s1,s2):
-    return ''.join(chr(ord(a) ^ ord(b)) for a,b in zip(s1,s2))
+    # return hex_xor(input, 'b'*len(input))
+    # for c in ascii_letters:
+    #     print hex_xor(input, c*len(input))
 
-for attempt in list(map(chr, range(97, 123))):
-    print xorstr(input, attempt)
+
+if __name__ == "__main__":
+    import sys
+    input=sys.argv[1]
+    key=sys.argv[2]
+
+    print(f'input={input}')
+    print(f'key={key}')
+    print(f'result={c3(input, key)}')

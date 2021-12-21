@@ -5,7 +5,7 @@ https://docs.python.org/3/library/unittest.html
 import random
 import unittest
 
-from s1_c1 import hex_to_b64
+from set1_ch1 import hex_to_b64
 
 class TestSequenceFunctions(unittest.TestCase):
     """ This is one of potentially many TestCases """

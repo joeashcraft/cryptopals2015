@@ -4,9 +4,10 @@
 import sys
 
 def c2(one:str, two:str):
+    """produce hex-encoded XOR of two equal-length hex-encoded strings."""
     assert len(one) == len(two)
-    _one=int(one, 16)
-    _two=int(two, 16)
+    _one=int(one.hex(), 16)
+    _two=int(two.hex(), 16)
 
     return hex(_one ^ _two)
 

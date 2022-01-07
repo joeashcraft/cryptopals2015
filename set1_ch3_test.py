@@ -2,21 +2,25 @@
 
 import unittest
 
-from set1_ch2 import c2
-# from s1_c3 ...
+from set1_ch3 import c3, main, equalize_lengths
 
 class TestSequenceFunctions(unittest.TestCase):
 
     def setUp(self):
-        self.input_1 = 'dead'
-        self.input_2 = 'bbbb'
-        self.expect_result = '0x6516''
+        self.plaintext = 'dead'
+        self.key = 'b'
+        self.ciphertext = '0x6516'
 
-    def test_decode(self):
-        """ make sure the shuffled sequence does not lose any elements """
+    def test_helpers(self):
         self.assertEqual(
-            c2(self.input_1, self.input_2),
-            self.expect_result
+            equalize_lengths('aaa', 'b'),
+            ('aaa', 'bbb')
+        )
+        
+    def test_main(self):
+        self.assertEqual(
+            main(self.ciphertext),
+            [(self.key, self.plaintext)]
         )
 
 if __name__ == '__main__':

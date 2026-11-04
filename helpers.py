@@ -77,6 +77,26 @@ def hex_to_b64(s: str):
     return b64_from_bytes.decode()
 
 
+def hex_xor(one: str, two: str) -> bytes:
+    """returns byte-encoded XOR result of 2 equal-length hex-encoded strings.
+
+    input:
+        * one (str): hex-encoded string, e.g. 'DEADBEEF'
+        * two (str): hex-encoded string, e.g. 'FACEFEED'
+    return: (bytes) XOR result of the two input strings
+    """
+    _a = bytes.fromhex(one)
+    _b = bytes.fromhex(two)
+
+    assert len(_a) == len(_b), "input strings must be of equal length"
+    # xor bytes
+    result = b""
+    for b1, b2 in zip(_a, _b):
+        result += bytes([b1 ^ b2])
+
+    return result
+
+
 if __name__ == "__main__":
   print('## string_print("abc") ##')
   string_print('abc')

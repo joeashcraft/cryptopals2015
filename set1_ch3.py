@@ -16,7 +16,7 @@ import sys
 import logging
 import helpers
 from string import ascii_letters, ascii_uppercase, printable, punctuation
-from set1_ch2 import c2 as hex_xor
+from set1_ch2 import hex_xor
 
 ETAOIN = 'ETAOINSHRDLCUMWFGYPBVKJXQZ'
 
@@ -30,7 +30,7 @@ def main(input:str) -> list:
     RETURN:
       (list) sorted list of tuples containing the KEY, PLAINTEXT, FREQ_ORDER_STR, SCORE, sorted by SCORE
     """
-    logging.debug("main() called with input=%s", input)
+    logging.debug("set1_ch3:main(input=%s)", input)
     HEAD=3 # how many results to print
     result=list()  # e.g. [('A', 'Attack at Dawn', 'ATCKDWN', 12), ('B', 'Bttbck bt Dbwn', 'BTCKDWN' 1)]
     letter_count=dict()  # dict of dicts like { KEY: {'A': 1, 'E': 3}, 'b': {'A':0, 'B':0, 'E':3}}
@@ -59,7 +59,7 @@ def main(input:str) -> list:
     result.sort(key=lambda x: x[3], reverse=True)
     # logging.debug(f'sorted result: {result[:2]}')
 
-    logging.debug("main() returns %s " % result[:HEAD])
+    logging.debug("set1_ch3:main() returns %s ..." % result[:HEAD])
     return(result)
 
 
@@ -113,11 +113,15 @@ def freq_scoring(freq_ordered:str)->int:
       integer score of 0 to 12 (inclusive) or 100
     """
     _func="freq_scoring"  # function name
-    logging.debug(f"{_func}({freq_ordered[:6]}...{freq_ordered[-6:]})")
+    logging.debug(f"set1_ch3:{_func}({freq_ordered[:6]}...{freq_ordered[-6:]})")
 
     if freq_ordered == ETAOIN:
         # just in case the input is perfect, quit early
+        logging.debug(f"set1_ch3:{_func}() match ETAOIN: 100")
         return 100
+    if freq_ordered == ascii_uppercase:
+        logging.debug(f"set1_ch3:{_func}() match ascii_uppercase: 5")
+        return 5
 
     score=0
     for c in freq_ordered[:6]:
@@ -126,6 +130,7 @@ def freq_scoring(freq_ordered:str)->int:
     for c in freq_ordered[-6:]:
         if c in ETAOIN[-6:]:
             score+=1
+    logging.debug(f"set1_ch3:{_func}() returns: {score}")
     return score
 
 def equalize_lengths(a, b) -> tuple:
@@ -154,13 +159,18 @@ def c3(input:str, key:str):
         input: a hex-encoded string (e.g. 'deadbeef')
         key: ascii-string
     """
-    logging.debug(f'c3(input={input}, key={key})')
+    logging.debug(f'set1_ch3:c3(input={input}, key={key})')
     _input=None
     _key=None
     result=dict()
 
-    _input=bytes.fromhex(input)
-    logging.debug(f'bytes input={_input}')
+    try:
+        _input=bytes.fromhex(str(input))
+        logging.debug(f'set1_ch3:c3():  bytes(input)={_input}')
+    except (ValueError, TypeError) as e:
+        logging.error(f'set1_ch3:c3():  input={input} is not a valid hex string')
+        raise e
+
 
 
     if key:
@@ -173,7 +183,7 @@ def c3(input:str, key:str):
         # _key = _key * len(_input)
         # logging.debug(f'new key={_key}')
         _input, _key = equalize_lengths(_input, _key)
-        logging.debug(f'bytes key={_key}')
+        logging.debug(f'set1_ch3:c3():  bytes(key)={_key}')
     # elif len(_key) == len(_input):
     #     _key=key
     #     logging.debug(f'new key={_key}')
@@ -198,18 +208,18 @@ def c3(input:str, key:str):
     else:
     # if no key given, try every printable
         for k in printable:
-            logging.debug(f'trying key {k}')
+            logging.debug(f'  trying key {k}')
             _key = k.encode()  # such as b'X'
             # _key:str=hex(ord(k))[2:]  # such as '0x7a'
 
             _input, _key = equalize_lengths(_input, _key)
-            h_e_s=hex_xor(_input, _key)[2:]
+            h_e_s=hex_xor(_input.hex(), _key.hex())[2:]
             # h_e_s=hex_xor(input, key*len(_input))[2:]
-            logging.debug(f'hex result={h_e_s}')
+            logging.debug(f'  hex result={h_e_s}')
             try:
                 ascii_string=helpers.hex_string_to_ascii_string(h_e_s).decode('utf-8')
                 result[k]=ascii_string
-                logging.info(f'{k}: {result[k]}')
+                logging.debug(f'set1_ch3:c3():  key={k}, xor={result[k]}')
             except ValueError:
                 logging.debug('hex result does not translate to ascii')
     # >>> bytes.fromhex(str(hex(int(_input.hex(),16) ^ int(_key.hex(),16))[2:]))

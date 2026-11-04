@@ -1,4 +1,5 @@
 #!env python3
+""" presentation functions."""
 
 from dataclasses import dataclass
 
@@ -26,8 +27,7 @@ def string_print(s:str):
     binary"""
     print(f'ascii={s}')
     print(f'hex={string_to_hex(s)}')
-    print()
-    # print(f'binary=')
+    print(f'binary={ascii_to_binary(s)}')
 
 def string_to_hex(s:str):
     """returns hex-encoded string from ascii string input, but slowly.
@@ -47,6 +47,15 @@ def ascii_to_hex(input:str) -> str:
     - discovered bytes.hex()
     """
     return input.encode().hex()
+
+def ascii_to_binary(input:str) -> str:
+    """returns binary string from ascii string input. """
+    return " ".join(f"{b:08b}" for b in input.encode())
+
+def bytes_to_binary(data: bytes) -> str:
+    """returns binary string from bytes input. """
+    return " ".join(f"{b:08b}" for b in data)
+
 
 def hex_string_to_ascii_string(s:str):
     if s[:2]=='0x':

@@ -56,11 +56,25 @@ def bytes_to_binary(data: bytes) -> str:
     """returns binary string from bytes input. """
     return " ".join(f"{b:08b}" for b in data)
 
-
+##
+## from hex
+##
 def hex_string_to_ascii_string(s:str):
     if s[:2]=='0x':
         s=s[2:]
     return bytes.fromhex(s)
+
+def hex_to_b64(s: str):
+    """returns base64-encoded string from hex-encoded string.
+
+    input: hex-encoded string, e.g. 'DEADBEEF'
+    return: (str) base64-encoded string, e.g. '3q2+7w=='
+    """
+    import base64
+
+    bytes_from_hex = bytes.fromhex(s)
+    b64_from_bytes = base64.b64encode(bytes_from_hex)
+    return b64_from_bytes.decode()
 
 
 if __name__ == "__main__":

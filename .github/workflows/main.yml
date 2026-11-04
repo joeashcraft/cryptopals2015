@@ -1,0 +1,16 @@
+name: Python Unittest
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare repo
+        uses: actions/checkout@master
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Run unittests
+        run: python3 -m unittest discover --pattern '*test.py'

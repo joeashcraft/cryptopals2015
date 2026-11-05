@@ -2,6 +2,7 @@
 """ presentation functions."""
 
 from dataclasses import dataclass
+import utils
 
 
 @dataclass(frozen=True)
@@ -85,16 +86,11 @@ def hex_xor(one: str, two: str) -> bytes:
         * two (str): hex-encoded string, e.g. 'FACEFEED'
     return: (bytes) XOR result of the two input strings
     """
+    assert len(one) == len(two), "input strings must be of equal length"
     _a = bytes.fromhex(one)
     _b = bytes.fromhex(two)
 
-    assert len(_a) == len(_b), "input strings must be of equal length"
-    # xor bytes
-    result = b""
-    for b1, b2 in zip(_a, _b):
-        result += bytes([b1 ^ b2])
-
-    return result
+    return utils.xor(_a, _b)
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ import sys
 import logging
 from helpers import hex_xor
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     logging.basicConfig(level=logging.DEBUG)
 
     try:

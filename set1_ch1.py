@@ -5,7 +5,7 @@ import sys
 import logging
 from helpers import hex_to_b64
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     logging.basicConfig(level=logging.DEBUG)
 
     try:

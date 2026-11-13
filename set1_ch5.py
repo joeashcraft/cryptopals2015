@@ -76,6 +76,6 @@ def main(puzzle_input_filename:str, key:str):
         logging.info("%s -> XOR %s -> %s", line, key, ciphertext)
     return ciphertext
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     logging.basicConfig(level=logging.INFO)
     print(main('set1_ch5-input.txt', 'OSWIN'))

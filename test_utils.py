@@ -68,5 +68,5 @@ class TestXor(unittest.TestCase):
         self.assertEqual(xor(plaintext, key), expected)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     unittest.main(argv=["first-arg-is-ignored"], exit=False)

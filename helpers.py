@@ -93,10 +93,10 @@ def hex_xor(one: str, two: str) -> bytes:
     return utils.xor(_a, _b)
 
 
-if __name__ == "__main__":
-  print('## string_print("abc") ##')
-  string_print('abc')
-  print()
+if __name__ == "__main__":  # pragma: no cover
+    print('## string_print("abc") ##')
+    string_print("abc")
+    print()
 
   print('## string_to_hex("abc") ##')
   print(string_to_hex('abc'))

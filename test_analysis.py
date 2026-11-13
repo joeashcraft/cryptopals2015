@@ -116,5 +116,5 @@ class TestFreqScoring(unittest.TestCase):
         self.assertEqual(freq_scoring(ascii_uppercase), 5)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     unittest.main(argv=["first-arg-is-ignored"], exit=False)

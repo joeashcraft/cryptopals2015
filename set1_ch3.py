@@ -83,7 +83,7 @@ def main(input:str) -> list:
     return result[:HEAD]
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     logging.basicConfig(level=logging.DEBUG)
 
     input, key = None, None

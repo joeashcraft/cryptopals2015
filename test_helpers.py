@@ -32,5 +32,5 @@ class Set1_Ch2(unittest.TestCase):
         )
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     unittest.main(argv=["first-arg-is-ignored"], exit=False)

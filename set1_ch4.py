@@ -63,6 +63,6 @@ def main(puzzle_input_filename: str):
     logger.info('main(): read %s lines of puzzle input', len(puzzle_input))
     return xor_and_score(puzzle_input)
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     logging.basicConfig(level=logging.DEBUG)
     main('set1_ch4-input.txt')

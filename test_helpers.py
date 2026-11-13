@@ -5,7 +5,56 @@ https://docs.python.org/3/library/unittest.html
 
 import unittest
 
-from helpers import hex_to_b64, hex_xor
+from helpers import (
+    ascii_to_binary,
+    ascii_to_hex,
+    bytes_to_binary,
+    Candidate,
+    hex_string_to_ascii_string,
+    hex_to_b64,
+    hex_xor,
+)
+
+ABC_ASCII = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+ABC_HEX = "4142434445464748494a4b4c4d4e4f505152535455565758595a"
+ABC_BINARY = "01000001 01000010 01000011 01000100 01000101 01000110 01000111 01001000 01001001 01001010 01001011 01001100 01001101 01001110 01001111 01010000 01010001 01010010 01010011 01010100 01010101 01010110 01010111 01011000 01011001 01011010"
+ABC_B64 = "QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo="
+
+
+class TestCandidate(unittest.TestCase):
+    def setUp(self):
+        self.candidate = Candidate(
+            key="A", plaintext="Hello, World!", freq_order="HELLO", score=100
+        )
+
+    def test_candidate(self):
+        self.assertEqual(self.candidate.key, "A")
+        self.assertEqual(self.candidate.plaintext, "Hello, World!")
+        self.assertEqual(self.candidate.freq_order, "HELLO")
+        self.assertEqual(self.candidate.score, 100)
+        self.assertEqual(self.candidate.line, -1)
+
+    def test_invalid_candidate(self):
+        with self.assertRaises(AssertionError):
+            Candidate(
+                key=None, plaintext="Hello, World!", freq_order="HELLO", score=100
+            )
+        with self.assertRaises(AssertionError):
+            Candidate(key="A", plaintext=None, freq_order="HELLO", score=100)
+        with self.assertRaises(AssertionError):
+            Candidate(key="A", plaintext="Hello, World!", freq_order=None, score=100)
+        with self.assertRaises(AssertionError):
+            Candidate(
+                key="A", plaintext="Hello, World!", freq_order="HELLO", score=None
+            )
+        with self.assertRaises(AssertionError):
+            Candidate(
+                key="A",
+                plaintext="Hello, World!",
+                freq_order="HELLO",
+                score=100,
+                line=None,
+            )
 
 
 class Set1_Ch1(unittest.TestCase):
@@ -30,6 +79,25 @@ class Set1_Ch2(unittest.TestCase):
         self.assertEqual(
             hex_xor(self.input_1, self.input_2), bytes.fromhex(self.expect_result)
         )
+
+
+class TestHelpers(unittest.TestCase):
+
+    def test_ascii_to_hex(self):
+        self.assertEqual(ascii_to_hex(ABC_ASCII), ABC_HEX)
+
+    def test_ascii_to_binary(self):
+        self.assertEqual(ascii_to_binary(ABC_ASCII), ABC_BINARY)
+
+    def test_bytes_to_binary(self):
+        self.assertEqual(bytes_to_binary(ABC_ASCII.encode()), ABC_BINARY)
+
+    def test_hex_string_to_ascii_string(self):
+        self.assertEqual(hex_string_to_ascii_string(ABC_HEX), ABC_ASCII)
+        self.assertEqual(hex_string_to_ascii_string("0x" + ABC_HEX), ABC_ASCII)
+
+    def test_hex_to_b64(self):
+        self.assertEqual(hex_to_b64(ABC_HEX), ABC_B64)
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -67,6 +67,11 @@ class TestLetterCounter(unittest.TestCase):
     def test_no_letters_returns_false(self):
         self.assertEqual(letter_counter("123!@#"), False)
 
+    def test_message_bytes(self):
+        self.assertEqual(
+            letter_counter(b"Hello, World!"), letter_counter("Hello, World!")
+        )
+
 
 class TestFrequencyOrder(unittest.TestCase):
     def setUp(self):

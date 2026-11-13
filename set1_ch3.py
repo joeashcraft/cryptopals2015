@@ -39,7 +39,7 @@ def main(input:str) -> list:
     logger.debug(f"set1_ch3:main(): input={input}")
 
     # calculate the XOR result for every possible single-byte key
-    xor_results = {k: xor(input, k.encode()) for k in "bX"}
+    xor_results = {k: xor(input, k.encode()) for k in printable}
     logger.debug("xor_results=%s", xor_results)
 
     # frequency analysis
@@ -47,10 +47,7 @@ def main(input:str) -> list:
         str, dict[str, int]
     ]()  # dict of dicts like { KEY: {'A': 1, 'E': 3}, 'b': {'A':0, 'B':0, 'E':3}}
     for result_key, result_plaintext in xor_results.items():
-        try:
-            letter_count[result_key] = letter_counter(result_plaintext)
-        except ValueError as e:
-            continue  # no letters found for key
+        letter_count[result_key] = letter_counter(result_plaintext) or {}
 
     # score the results
     result = (

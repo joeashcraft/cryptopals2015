@@ -1,7 +1,7 @@
 #!env python3
 import unittest
 
-from utils import equalize_lengths, xor
+import utils
 
 
 class TestEqualize_lengths(unittest.TestCase):
@@ -14,26 +14,25 @@ class TestEqualize_lengths(unittest.TestCase):
 
     def test_equal_lengths_noop(self):
         self.assertEqual(
-            equalize_lengths(self.a, self.b_equal),
+            utils.equalize_lengths(self.a, self.b_equal),
             (self.a, self.b_equal),
         )
 
     def test_single_byte_b(self):
         self.assertEqual(
-            equalize_lengths(self.a, self.b_one),
+            utils.equalize_lengths(self.a, self.b_one),
             (self.a, b"XXXX"),
         )
 
     def test_shorter_b(self):
         self.assertEqual(
-            equalize_lengths(self.a, self.b_shorter),
+            utils.equalize_lengths(self.a, self.b_shorter),
             (self.a, b"wxyw"),
         )
 
     def test_longer_b(self):
         self.assertEqual(
-            equalize_lengths(self.a, self.b_longer),
-            (self.a, b"wxyz")
+            utils.equalize_lengths(self.a, self.b_longer), (self.a, b"wxyz")
         )
 
 
@@ -46,11 +45,11 @@ class TestXor(unittest.TestCase):
         )
 
     def test_xor_equal_length(self):
-        self.assertEqual(xor(self.input_1, self.input_2), self.expect_result)
+        self.assertEqual(utils.xor(self.input_1, self.input_2), self.expect_result)
 
     def test_xor_single_byte_key(self):
-        self.assertEqual(xor(b"ICE", b"\x00"), b"ICE")
-        self.assertEqual(xor(b"\x00\x00\x00", b"I"), b"III")
+        self.assertEqual(utils.xor(b"ICE", b"\x00"), b"ICE")
+        self.assertEqual(utils.xor(b"\x00\x00\x00", b"I"), b"III")
 
     def test_xor_repeating_key(self):
         # "ICE" repeated against plaintext, same as set1 challenge 5 idea
@@ -65,7 +64,16 @@ class TestXor(unittest.TestCase):
                 ord("n") ^ ord("I"),
             ]
         )
-        self.assertEqual(xor(plaintext, key), expected)
+        self.assertEqual(utils.xor(plaintext, key), expected)
+
+
+class TestSingleByteXorSolve(unittest.TestCase):
+    def setUp(self):
+        self.ciphertext = bytes.fromhex("190c0c191b1358190c581c190f16")
+        self.expected = ("x", b"attack at dawn", "ATCDKNWBEFGHIJLMOPQRSUVXYZ", 6)
+
+    def test_single_byte_xor_solve(self):
+        self.assertEqual(utils.single_byte_xor_solve(self.ciphertext)[0], self.expected)
 
 
 if __name__ == "__main__":  # pragma: no cover

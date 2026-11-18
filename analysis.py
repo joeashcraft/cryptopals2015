@@ -20,7 +20,7 @@ def letter_counter(message) -> [dict, bool]:
     logger.debug(f"letter_counter(message={message[:3]}... {type(message)})")
     if isinstance(message, bytes):
         # decode bytes to ascii string, replace non-ascii with '?'
-        logger.info(f"letter_counter() decoding bytes to ascii string")
+        logger.debug(f"letter_counter() decoding bytes to ascii string")
         _message = message.decode("ascii", errors="replace").upper()
     else:
         _message = message.upper()

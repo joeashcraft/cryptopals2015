@@ -118,7 +118,7 @@ def single_byte_xor_solve(ciphertext: Ciphertext, count: int = 3) -> tuple:
 
             continue
         # determine order of frequency of letters in the plaintext
-        logger.info("key '%s', plaintext '%s'", key.encode(), plaintext)
+        logger.debug("key '%s', plaintext '%s'", key.encode(), plaintext)
         freq_ord = analysis.frequency_order(
             letter_count
         )  # e.g. 'ATCDKNWBEFGHIJLMOPQRSUVXYZ'

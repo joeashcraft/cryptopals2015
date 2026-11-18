@@ -33,12 +33,7 @@ def letter_counter(message) -> [dict, bool]:
         "S": 0, "T": 0, "U": 0, "V": 0, "W": 0, "X": 0,
         "Y": 0, "Z": 0,
     }
-    # TODO score should reduce for non-printable and punctuation, so letter_counter should probably not be restricted to just ascii_uppercase.
-    # maybe make new 'byte_counter()'
-    # key: message
-    # ('x', [b'cOOKING\x00mc\x07S\x00LIKE\x00A\x00POUND\x00OF\x00BACON', 'OCNAIKBDEFGLMPSUZQXJVYWRHT', 3])
-    # ('X', [b"Cooking MC's like a pound of bacon", 'OCNAIKBDEFGLMPSUZQXJVYWRHT', 3])
-    # ('r', [b'iEEACDM\ngi\rY\nFCAO\nK\nZE_DN\nEL\nHKIED', 'EDIACKFGHLMNOYZQXJVBPWURST', 1])
+
     logger.debug(f"letter_counter() message: {_message}")
     for char in _message:
         # logger.debug(f"letter_counter() char: {char} {type(char)}")

@@ -36,6 +36,7 @@ pip-delete-this-directory.txt
 htmlcov/
 .tox/
 .coverage
+coverage/
 .cache
 nosetests.xml
 coverage.xml
@@ -52,3 +53,10 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# IDE
+.cursor
+.vscode
+
+# pyenv
+.python-version

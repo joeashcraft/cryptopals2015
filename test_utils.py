@@ -1,7 +1,19 @@
 #!env python3
 import unittest
+import logging
 
 import utils
+
+
+class TestCiphertext(unittest.TestCase):
+    def setUp(self):
+        self.ciphertext = utils.Ciphertext(
+            value="ABC123DEF456",
+            key="A",
+            plaintext="Hello, World!",
+            freq_order="HELLO",
+            score=100,
+        )
 
 
 class TestEqualize_lengths(unittest.TestCase):
@@ -40,9 +52,7 @@ class TestXor(unittest.TestCase):
     def setUp(self):
         self.input_1 = bytes.fromhex("1c0111001f010100061a024b53535009181c")
         self.input_2 = bytes.fromhex("686974207468652062756c6c277320657965")
-        self.expect_result = bytes.fromhex(
-            "746865206b696420646f6e277420706c6179"
-        )
+        self.expect_result = bytes.fromhex("746865206b696420646f6e277420706c6179")
 
     def test_xor_equal_length(self):
         self.assertEqual(utils.xor(self.input_1, self.input_2), self.expect_result)
@@ -70,11 +80,12 @@ class TestXor(unittest.TestCase):
 class TestSingleByteXorSolve(unittest.TestCase):
     def setUp(self):
         self.ciphertext = bytes.fromhex("190c0c191b1358190c581c190f16")
-        self.expected = ("x", b"attack at dawn", "ATCDKNWBEFGHIJLMOPQRSUVXYZ", 6)
+        self.expected = (("x", [b"attack at dawn", "ATCDKNWZQXJVBPYGFMULRHSIOE", -1]),)
 
     def test_single_byte_xor_solve(self):
-        self.assertEqual(utils.single_byte_xor_solve(self.ciphertext)[0], self.expected)
+        self.assertEqual(utils.single_byte_xor_solve(self.ciphertext, 1), self.expected)
 
 
 if __name__ == "__main__":  # pragma: no cover
+    logging.basicConfig(level=logging.DEBUG)
     unittest.main(argv=["first-arg-is-ignored"], exit=False)

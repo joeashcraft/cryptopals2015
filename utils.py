@@ -1,7 +1,47 @@
 #!env python3
 """functions that operate on bytes."""
+from dataclasses import dataclass
 import logging
+
 logger = logging.getLogger(__name__)
+
+# with open("set1_ch4-input.txt", "r") as f:
+#     ciphertexts = f.read().splitlines()  # TODO delete after testing
+# ciphertext = bytes.fromhex(
+#     "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
+# )
+
+
+# ciphertexts = {
+#     "apjiosasd": {
+#         "xor": {
+#             "A": {
+#                 "result": "88fe8a"
+#             },
+#             "B": {
+#                 "result": "attack at dawn"
+#             }
+#         }
+#     }
+# }
+
+# ciphertexts['apjiosasd']['xor']['B']['result']='attack at dawn'
+
+# class Ciphertext:
+#     value: str
+#     xor: dict[Candidate]
+
+
+@dataclass
+class Ciphertext:
+    """A single ciphertext/plaintext with analysis."""
+
+    value: str
+    key: str = None
+    plaintext: str = None
+    freq_order: str = None
+    score: int = None
+    xor: list = None
 
 
 def equalize_lengths(a: any, b: any) -> tuple[any, any]:
@@ -53,3 +93,76 @@ def xor(a: bytes, b: bytes) -> bytes:
     (a, b) = equalize_lengths(a, b)
 
     return bytes([x ^ y for x, y in zip(a, b)])
+
+
+def single_byte_xor_solve(ciphertext: Ciphertext, count: int = 3) -> tuple:
+    """Try to solve a single-byte XOR cipher.
+
+    Args:
+        * ciphertext (bytes): the ciphertext to solve
+        * count (int): the number of results to return
+
+    Returns:
+        (tuple) ((key, plaintext, freq_order, score), ...) sorted by score
+
+    """
+    import analysis
+    from string import printable
+
+    assert isinstance(ciphertext, bytes), "ciphertext must be bytes"
+    assert all(
+        [isinstance(count, int), count > 0]
+    ), "count must be an integer greater than 0"
+
+    result = dict[
+        str:[bytes, str, int]
+    ]()  # {'key': [plaintext, freq_order, score], ...}
+    # e.g. { 'A': [b'attack at dawn', 'ETAOINSHRDLCUMWFGYPBVKJXQZ', 100] }
+
+    # xor_results = dict[str, bytes]()  # { 'A': b'attack at dawn' }
+    # letter_count = dict[str, dict[str, int]]()  # { 'A': { 'A': 1, 'E': 3 } }
+    # for k in printable:
+    #     xor_results[k] = xor(ciphertext, k.encode())
+
+    # try every printable single-byte key
+    for k in printable:
+        result[k] = [
+            xor(ciphertext, k.encode()),
+            "",
+            -100,
+        ]
+
+    # frequency analysis
+    for key, [plaintext, _, score] in result.items():
+        result[key] = [plaintext, analysis.letter_counter(plaintext) or {}, score]
+
+    # score the results
+    for key, [plaintext, letter_count, score] in result.items():
+        if not letter_count:
+            logger.info("skip key '%s' because no letters found", key.encode())
+            logger.debug("skipped result '%s'", result[key])
+
+            continue
+        # determine order of frequency of letters in the plaintext
+        logger.info("key '%s', plaintext '%s'", key.encode(), plaintext)
+        freq_ord = analysis.frequency_order(
+            letter_count
+        )  # e.g. 'ATCDKNWBEFGHIJLMOPQRSUVXYZ'
+
+        # score the plaintext based on the frequency of letters
+        score = analysis.freq_scoring(freq_ord, plaintext)  # e.g. 12
+
+        result[key] = [plaintext, freq_ord, score]
+
+    sort_keys = sorted(result, key=lambda k: result[k][2], reverse=True)
+    logger.debug("sorted keys: %s", sort_keys)
+
+    # result = (k, [result[k] for k in sort_keys])
+    _result = []
+    for k in sort_keys:
+        _result.append((k, result[k]))
+    final_result = tuple(_result)
+    # breakpoint()
+    logger.info("single_byte_xor_solve: return %s", final_result)
+    return final_result[:count]  # TODO rename
+    # return result

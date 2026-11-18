@@ -5,32 +5,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# with open("set1_ch4-input.txt", "r") as f:
-#     ciphertexts = f.read().splitlines()  # TODO delete after testing
-# ciphertext = bytes.fromhex(
-#     "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
-# )
-
-
-# ciphertexts = {
-#     "apjiosasd": {
-#         "xor": {
-#             "A": {
-#                 "result": "88fe8a"
-#             },
-#             "B": {
-#                 "result": "attack at dawn"
-#             }
-#         }
-#     }
-# }
-
-# ciphertexts['apjiosasd']['xor']['B']['result']='attack at dawn'
-
-# class Ciphertext:
-#     value: str
-#     xor: dict[Candidate]
-
 
 @dataclass
 class Ciphertext:
@@ -165,4 +139,3 @@ def single_byte_xor_solve(ciphertext: Ciphertext, count: int = 3) -> tuple:
     # breakpoint()
     logger.info("single_byte_xor_solve: return %s", final_result)
     return final_result[:count]  # TODO rename
-    # return result

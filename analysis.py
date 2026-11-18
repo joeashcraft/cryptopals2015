@@ -6,10 +6,11 @@ logger = logging.getLogger(__name__)
 from string import ascii_letters, ascii_uppercase, printable, punctuation
 
 ETAOIN = "ETAOINSHRDLCUMWFGYPBVKJXQZ"
+ZQXJKV = "ZQXJKVBPYGFWMUCLDRHSNIOATE"  # opposite of ETAOIN
 
 
-def letter_counter(message) -> dict:
-    """Returns a dictionary with keys of single letters and values of the count of those in the message.
+def letter_counter(message) -> [dict, bool]:
+    """Returns False or a dictionary with keys of single letters and values of the count of those in the message.
 
     Case-insensitive! Converts everything to UPPER CASE.
     Ignores anything which is not a letter.
@@ -20,7 +21,7 @@ def letter_counter(message) -> dict:
     if isinstance(message, bytes):
         # decode bytes to ascii string, replace non-ascii with '?'
         logger.info(f"letter_counter() decoding bytes to ascii string")
-        _message = message.decode('ascii', errors='replace').upper()
+        _message = message.decode("ascii", errors="replace").upper()
     else:
         _message = message.upper()
 
@@ -32,7 +33,12 @@ def letter_counter(message) -> dict:
         "S": 0, "T": 0, "U": 0, "V": 0, "W": 0, "X": 0,
         "Y": 0, "Z": 0,
     }
-
+    # TODO score should reduce for non-printable and punctuation, so letter_counter should probably not be restricted to just ascii_uppercase.
+    # maybe make new 'byte_counter()'
+    # key: message
+    # ('x', [b'cOOKING\x00mc\x07S\x00LIKE\x00A\x00POUND\x00OF\x00BACON', 'OCNAIKBDEFGLMPSUZQXJVYWRHT', 3])
+    # ('X', [b"Cooking MC's like a pound of bacon", 'OCNAIKBDEFGLMPSUZQXJVYWRHT', 3])
+    # ('r', [b'iEEACDM\ngi\rY\nFCAO\nK\nZE_DN\nEL\nHKIED', 'EDIACKFGHLMNOYZQXJVBPWURST', 1])
     logger.debug(f"letter_counter() message: {_message}")
     for char in _message:
         # logger.debug(f"letter_counter() char: {char} {type(char)}")
@@ -54,13 +60,24 @@ def frequency_order(letter_count: dict) -> str:
     Args:
       letter_count: dictionary with keys of UPPER CASE letters and values of integers
     """
+    assert isinstance(
+        letter_count, dict
+    ), "analysis.frequency_order expect dict, got %s" % type(letter_count)
+    logger.debug("frequency_order(letter_count=%s)", letter_count)
+
     my_list = sorted(letter_count, key=lambda c: letter_count[c], reverse=True)
+    for c in ZQXJKV:
+        # for letters not present, final order should match ZQXJKV
+        if letter_count[c] == 0:
+            my_list.remove(c)
+            my_list.append(c)
+
     my_string = "".join(my_list)
-    logger.debug(f"frequency_order() returns: {my_string}")
+    logger.debug("frequency_order() returns: %s", my_string)
     return my_string
 
 
-def freq_scoring(freq_ordered: str) -> int:
+def freq_scoring(freq_ordered: str, plaintext: str = None) -> int:
     """Returns an integer score of how closely the input matches normal English character frequency distribution ("ETAOIN").
 
     Scoring algorithm: 1 point for each of the first 6 characters which are
@@ -85,14 +102,58 @@ def freq_scoring(freq_ordered: str) -> int:
         return 100
     if freq_ordered == ascii_uppercase:
         logger.debug(f"{_func}() match ascii_uppercase: 5")
-        # return 5
 
     score = 0
-    for c in freq_ordered[:6]:
-        if c in ETAOIN[:6]:
+    for common_letter in freq_ordered[:6]:
+        if common_letter in ETAOIN[:6]:
             score += 1
-    for c in freq_ordered[-6:]:
-        if c in ETAOIN[-6:]:
+        if common_letter in ETAOIN[-6:]:
+            score -= 1
+    for uncommon_letter in freq_ordered[-6:]:
+        if uncommon_letter in ETAOIN[-6:]:
             score += 1
+        if uncommon_letter in ETAOIN[:6]:
+            score -= 1
+
+    if plaintext:
+        logger.debug("%s() plaintext='%s'", _func, plaintext)
+        for c in plaintext:
+            if not chr(c) in printable:
+                logger.debug("{_func}() plaintext byte '%s' not printable", (c))
+                score -= 1
+
     logger.debug(f"{_func}() returns: {score}")
     return score
+
+
+def hamming_distance(string_a: bytes, string_b: bytes) -> int:  # set1_ch6
+    """returns the bit-level Hamming distance between two strings."""
+    # 2. Write a function to compute the edit distance/Hamming distance between two strings. The Hamming distance is just the number of differing bits. The distance between:
+    #         `this is a test`
+    #     and
+    #         `wokka wokka!!!`
+    #     is 37. Make sure your code agrees before you proceed.
+
+    _string_a = string_a
+    _string_b = string_b
+    # ensure input is bytes
+    if type(_string_a) != bytes:
+        _string_a = ascii_to_binary(_string_a)
+    if type(_string_b) != bytes:
+        _string_b = ascii_to_binary(_string_b)
+
+    diff_pointer = ""
+    for bit1, bit2 in zip(_string_a, _string_b):
+        if bit1 != bit2:
+            diff_pointer += "^"
+        else:
+            diff_pointer += " "
+    logging.debug("set1_ch6:hamming_distance(): string_a    : %s", _string_a)
+    logging.debug("set1_ch6:hamming_distance(): string_b    : %s", _string_b)
+    logging.debug("set1_ch6:hamming_distance(): diff_pointer: %s", diff_pointer)
+    logging.debug(
+        "set1_ch6:hamming_distance() returns: %d",
+        sum(bit1 != bit2 for bit1, bit2 in zip(_string_a, _string_b)),
+    )
+
+    return sum(bit1 != bit2 for bit1, bit2 in zip(_string_a, _string_b))

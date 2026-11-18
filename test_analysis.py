@@ -1,5 +1,6 @@
 #!env python3
 import unittest
+import logging
 from string import ascii_uppercase
 
 from analysis import ETAOIN, letter_counter, frequency_order, freq_scoring
@@ -91,6 +92,15 @@ class TestFrequencyOrder(unittest.TestCase):
             "H": 8, "V": 7, "P": 6, "Z": 5, "N": 4, "W": 3,
             "S": 2, "C": 1,
         }
+        # fmt: off
+        self.letter_count_zero = {
+            "A": 0, "B": 0, "C": 0, "D": 0, "E": 0, "F": 0,
+            "G": 0, "H": 0, "I": 0, "J": 0, "K": 0, "L": 0,
+            "M": 0, "N": 0, "O": 0, "P": 0, "Q": 0, "R": 0,
+            "S": 0, "T": 0, "U": 0, "V": 0, "W": 0, "X": 0,
+            "Y": 0, "Z": 0,
+        }
+
         self.letter_count_random_expected = "ODEBUIRJAGXFYTKMQLHVPZNWSC"
 
     def test_etaoin_order(self):
@@ -111,10 +121,10 @@ class TestFreqScoring(unittest.TestCase):
         self.assertEqual(freq_scoring(ETAOIN), 100)
 
     def test_random_order(self):
-        self.assertEqual(freq_scoring(self.letter_count_random_expected), 3 + 1)
+        self.assertEqual(freq_scoring(self.letter_count_random_expected), 3)
 
     def test_garbage(self):
-        self.assertEqual(freq_scoring("\x101)~*6?*~*6;~.?,*'~7-~4+3.709T"), 0)
+        self.assertEqual(freq_scoring("\x101)~*6?*~*6;~.?,*'~7-~4+3.709T"), -1)
 
     def test_ascii_uppercase(self):
         # ABCDEF ∩ ETAOIN = A,E (2); UVWXYZ ∩ VKJXQZ = V,X,Z (3)
@@ -122,4 +132,5 @@ class TestFreqScoring(unittest.TestCase):
 
 
 if __name__ == "__main__":  # pragma: no cover
+    logging.basicConfig(level=logging.DEBUG)
     unittest.main(argv=["first-arg-is-ignored"], exit=False)

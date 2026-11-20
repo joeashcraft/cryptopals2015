@@ -139,3 +139,34 @@ def single_byte_xor_solve(ciphertext: Ciphertext, count: int = 3) -> tuple:
     # breakpoint()
     logger.info("single_byte_xor_solve: return %s", final_result)
     return final_result[:count]  # TODO rename
+
+
+def repeating_key_xor(plaintext: bytes, key: bytes) -> bytes:
+    """Encrypt plaintext using repeating-key XOR.
+    If key is 'ICE', then 'ICEICEICE...' will be used.
+
+    Args:
+        plaintext (bytes): the plaintext to encrypt
+        key (bytes): the key
+
+    Returns:
+        (bytes) the result
+    """
+    ciphertext = []
+    logging.debug("repeating_key_xor(): plaintext: %s, key: %s", plaintext, key)
+
+    for i, byte in enumerate(plaintext):
+        logging.debug(
+            "  for( i: %3d,  byte: %3d (%s), key: %s (%s) )",
+            i,
+            byte,
+            chr(byte),
+            key[i % len(key)],
+            chr(key[i % len(key)]),
+        )
+
+        ciphertext.append(byte ^ key[i % len(key)])
+        logging.debug("    ciphertext: %s (%s)", ciphertext[-1], hex(ciphertext[-1]))
+
+    logger.info("repeating_key_xor() returns %s bytes", len(ciphertext))
+    return bytes(ciphertext)

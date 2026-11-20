@@ -20,62 +20,68 @@ a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f
 Encrypt a bunch of stuff using your repeating-key XOR function. Encrypt your
 mail. Encrypt your password file. Your .sig file. Get a feel for it. I promise,
 we aren't wasting your time with this.
+
+USAGE: python3 set1_ch5.py [<plaintext_file> <key_file>]
+
+With no args, encrypts the challenge stanza under key ICE.
+With two args, both files are read as ASCII (key trailing newline stripped).
 """
 
 __author__ = "Joe Ashcraft"
 __license__ = "MIT"
 
 import logging
-import pprint
-from helpers import Candidate
-from set1_ch2 import hex_xor
+import sys
+import utils
+from string import printable
 
 logger = logging.getLogger(__name__)
-pp = pprint.PrettyPrinter(width=150, compact=True)
 
-def repeating_key_xor(plaintext:str, key:str) -> str:
-    """Encrypt plaintext using repeating-key XOR.
+CHALLENGE_PLAINTEXT = (
+    "Burning 'em, if you ain't quick and nimble\n" "I go crazy when I hear a cymbal"
+)
+CHALLENGE_KEY = "ICE"
 
-    Args:
-        plaintext: str to encrypt
-        key: str to use as the key
 
-    Returns:
-        (str) the ciphertext in hex
-    """
-    ciphertext = []
-    _plaintext = plaintext.encode('utf-8')
-    _key = key.encode('utf-8')
-    logging.debug("repeating_key_xor(): plaintext: %s, key: %s", _plaintext, _key)
-
-    for i, byte in enumerate(_plaintext):
-        logging.debug("  for( i: %3d,  byte: %3d (%s), key: %s (%s) )", i, byte, chr(byte), _key[i % len(key)], chr(_key[i % len(key)]) )
-
-        ciphertext.append(byte ^ _key[i % len(key)])
-        logging.debug("    ciphertext: %s (%s)", ciphertext[-1], hex(ciphertext[-1]))
-
-    return bytes(ciphertext).hex()
-    # return ''.join(ciphertext)
-
-def main(puzzle_input_filename:str, key:str):
-    """Run each line of puzzle input through repeating_key_xor with the given key. One key per file.
+def main(plaintext: str, key: str) -> bytes:
+    """Encrypt ASCII plaintext with repeating-key XOR.
 
     Returns:
-    (list) list of strings, XOR'd from the input file, one string per line.
+        (bytes) ciphertext
     """
-    _func="main"
+    # if plaintext is hex-only, use bytes.fromhex()
+    try:
+        _plaintext = bytes.fromhex("".join(plaintext.split()))
+        logger.warning("plaintext is hex")
+    except ValueError:
+        _plaintext = plaintext.encode("utf-8")
+    _key = key.encode("utf-8")
 
-    with open(puzzle_input_filename, 'r') as f:
-        puzzle_input=f.read().splitlines()
-    logger.info(f'{_func}(): read {len(puzzle_input)} lines of puzzle input')
-
-
-    # run repeating_key_xor for each line of puzzle input
-    for line in puzzle_input:
-        ciphertext = repeating_key_xor(line, key)
-        logging.info("%s -> XOR %s -> %s", line, key, ciphertext)
+    ciphertext = utils.repeating_key_xor(_plaintext, _key)
+    logger.info("%r -> XOR %r -> %s", plaintext, key, ciphertext.hex())
     return ciphertext
 
+
 if __name__ == "__main__":  # pragma: no cover
-    logging.basicConfig(level=logging.INFO)
-    print(main('set1_ch5-input.txt', 'OSWIN'))
+    logging.basicConfig(level=logging.ERROR)
+
+    if len(sys.argv) not in (1, 3):
+        print("USAGE: python3 set1_ch5.py [<plaintext_file> <key_file>]")
+        sys.exit(1)
+
+    if len(sys.argv) == 1:
+        plaintext, key = CHALLENGE_PLAINTEXT, CHALLENGE_KEY
+    else:
+        with open(sys.argv[1], "r") as f:
+            plaintext = f.read()
+        with open(sys.argv[2], "r") as f:
+            key = f.read().rstrip("\n")
+
+    result = main(plaintext, key)
+
+    print(
+        "==> hex <==\n%s" % result.hex(),
+        "==> UTF-8 <==\n%s" % result.decode(encoding="utf-8"),
+        sep="\n\n",
+        end="",
+    )
